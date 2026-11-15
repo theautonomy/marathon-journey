@@ -1,0 +1,33 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap');
+
+:root {
+  --m-bg:      #f7f5f2;
+  --m-surface: #ffffff;
+  --m-border:  rgba(0, 0, 0, 0.1);
+  --m-orange:  #e06800;
+  --m-text:    #1a1a1a;
+  --m-muted:   #888888;
+  --m-subtle:  rgba(0, 0, 0, 0.06);
+  --font-main: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+}
+
+.slidev-layout {
+  position: relative;
+  background: var(--m-bg);
+  color: var(--m-text);
+  font-family: var(--font-main);
+  padding: 0;
+  overflow: hidden;
+}
+
+.slidev-layout::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--m-orange, #e06800);
+  z-index: 100;
+}

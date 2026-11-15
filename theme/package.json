@@ -1,0 +1,11 @@
+{
+  "name": "slidev-theme-marathon",
+  "version": "0.1.0",
+  "keywords": ["slidev-theme"],
+  "slidev": {
+    "defaults": {
+      "transition": "fade",
+      "colorSchema": "light"
+    }
+  }
+}
