@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { racesOnPage } from '../races'
+import { computed } from 'vue'
 
 const props = defineProps<{ page: number }>()
 
@@ -12,17 +13,7 @@ interface Row {
   pace: string
 }
 
-const rows = ref<Row[]>([])
-
-onMounted(async () => {
-  const base = import.meta.env.BASE_URL
-  const start = (props.page - 1) * 10 + 1
-  rows.value = await Promise.all(
-    Array.from({ length: 10 }, (_, i) =>
-      fetch(`${base}marathon/data/marathon${start + i}.json`).then(r => r.json())
-    )
-  )
-})
+const rows = computed<Row[]>(() => racesOnPage(Number(props.page)))
 
 function fmt(d: string) {
   if (!d || d === 'TBD') return '—'

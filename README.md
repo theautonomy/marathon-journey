@@ -15,11 +15,19 @@ pnpm export    # PDF → exports/marathon-journey.pdf
 
 ```
 slides.md          the deck
-theme/             local theme (layouts: cover, stats, table, marathon; components: MarathonNav, MarathonStats, MarathonTable)
-public/marathon/   race data (data/marathonN.json, marathonsN.json table pages, quotes.json) and photos (img/)
+data/              race data: marathon<N>.json (one per race) and quotes.json
+public/marathon/   photos (img/), served at /marathon/img/
+theme/             local theme: layouts, components, styles, races.ts, setup/preparser.ts
 ```
 
-Each race slide is `layout: marathon` with `n: <race number>`; the layout fetches `public/marathon/data/marathon<n>.json`. Table slides (`layout: table`, `page: <n>`) read `marathons<n>.json`.
+## Adding or removing races
+
+The race list is driven entirely by `data/marathon<N>.json`; nothing else holds a count.
+
+- **Slides:** `slides.md` has one placeholder slide whose frontmatter is `marathon: races`. The preparser in `theme/setup/preparser.ts` expands it into the race-log table pages (10 races per page) and one `layout: marathon` slide per data file, ordered by `id`.
+- **Theme:** `theme/races.ts` bundles every data file with `import.meta.glob`, and the stats, table, navigator and progress bar all read from it.
+
+To add a race, drop in `data/marathon<N>.json` (with `"id": N`) and, if it has its own photo, `public/marathon/img/<picture>`. In `pnpm dev`, restart the server after adding or removing a file so the slide list is regenerated.
 
 ## Dependency pin
 

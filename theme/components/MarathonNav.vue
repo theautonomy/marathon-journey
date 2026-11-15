@@ -1,8 +1,9 @@
 <script setup lang="ts">
+import { RACES } from '../races'
 import { ref, computed, watch, nextTick, onBeforeUnmount } from 'vue'
 import { useNav } from '@slidev/client'
 
-const { go, currentPage } = useNav()
+const { go, slides, currentSlideRoute } = useNav()
 const open = ref(false)
 const query = ref('')
 const searchInput = ref<HTMLInputElement | null>(null)
@@ -20,12 +21,13 @@ watch(open, (val) => {
 
 onBeforeUnmount(() => document.removeEventListener('click', onDocClick))
 
-const OFFSET = 12
+// Race slides are found by their frontmatter, so their position in the deck doesn't matter.
+function raceOf(route: { meta?: any }): number | null {
+  const fm = route.meta?.slide?.frontmatter
+  return fm?.layout === 'marathon' ? Number(fm.n) : null
+}
 
-const currentRace = computed(() => currentPage.value - OFFSET)
-
-// Module-level cache so races load once across all slides
-interface Race { id: number; name: string; location: string; date: string; time: string }
+const currentRace = computed(() => raceOf(currentSlideRoute.value))
 
 function fmtDate(d: string): string {
   if (!d || d === 'TBD') return '—'
@@ -34,26 +36,10 @@ function fmtDate(d: string): string {
     return new Date(+y, +m - 1, +day).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
   } catch { return d }
 }
-let cache: Race[] | null = null
-const races = ref<Race[]>([])
-const loading = ref(false)
-
-async function loadRaces() {
-  if (cache) { races.value = cache; return }
-  loading.value = true
-  const base = import.meta.env.BASE_URL
-  cache = await Promise.all(
-    Array.from({ length: 100 }, (_, i) =>
-      fetch(`${base}marathon/data/marathon${i + 1}.json`).then(r => r.json())
-    )
-  )
-  races.value = cache!
-  loading.value = false
-}
+const races = RACES
 
 watch(open, async (val) => {
   if (val) {
-    loadRaces()
     await nextTick()
     searchInput.value?.focus()
   } else {
@@ -64,7 +50,7 @@ watch(open, async (val) => {
 const filtered = computed(() => {
   const q = query.value.trim().toLowerCase()
   if (!q) return []
-  return races.value.filter(r =>
+  return races.filter(r =>
     r.name.toLowerCase().includes(q) ||
     r.location.toLowerCase().includes(q)
   )
@@ -77,13 +63,14 @@ function raceName(name: string) {
 }
 
 function goToRace(n: number) {
-  go(n + OFFSET)
+  const route = slides.value.find(s => raceOf(s) === n)
+  if (route) go(route.no)
   open.value = false
   nextTick(() => (document.activeElement as HTMLElement)?.blur())
 }
 
 function isFinished(n: number): boolean {
-  const race = races.value[n - 1]
+  const race = races.find(r => r.id === n)
   if (!race || !race.date || race.date === 'TBD') return false
   const [m, day, y] = race.date.split('/')
   return new Date(+y, +m - 1, +day) < new Date()
@@ -121,8 +108,7 @@ function isFinished(n: number): boolean {
 
         <!-- Search results -->
         <template v-if="isSearching">
-          <div v-if="loading" class="mnav-empty">Loading…</div>
-          <div v-else-if="filtered.length === 0" class="mnav-empty">No matches</div>
+          <div v-if="filtered.length === 0" class="mnav-empty">No matches</div>
           <div v-else class="mnav-results">
             <button
               v-for="r in filtered"
@@ -146,7 +132,7 @@ function isFinished(n: number): boolean {
           <div class="mnav-header">Jump to Race</div>
           <div class="mnav-grid">
             <button
-              v-for="n in 100"
+              v-for="n in races.map(r => r.id)"
               :key="n"
               class="mnav-cell"
               :class="{ 'is-current': currentRace === n, 'is-finished': isFinished(n) }"

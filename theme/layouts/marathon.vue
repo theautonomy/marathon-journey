@@ -1,14 +1,7 @@
 <script setup lang="ts">
+import { RACE_COUNT, raceById } from '../races'
+import quotes from '../../data/quotes.json'
 import { ref, onMounted, computed } from 'vue'
-
-// Module-level quotes cache
-let quotesCache: string[] | null = null
-async function loadQuotes(base: string): Promise<string[]> {
-  if (quotesCache) return quotesCache
-  const r = await fetch(`${base}marathon/data/quotes.json`)
-  quotesCache = await r.json()
-  return quotesCache!
-}
 
 const props = defineProps<{ n: number }>()
 
@@ -64,15 +57,9 @@ const locationPhotos: Record<string, string> = {
   'Zhejiang, China':     'https://images.unsplash.com/photo-1526481280693-3bfa7568e0f3?w=1920&q=80&fit=crop',
 }
 
-const marathon = ref<MarathonData | null>(null)
+const marathon = computed<MarathonData | null>(() => raceById(Number(props.n)) ?? null)
 
-onMounted(async () => {
-  const base = import.meta.env.BASE_URL
-  const [data, quotes] = await Promise.all([
-    fetch(`${base}marathon/data/marathon${props.n}.json`).then(r => r.json()),
-    loadQuotes(base),
-  ])
-  marathon.value = data
+onMounted(() => {
   quote.value = parseQuote(quotes[Math.floor(Math.random() * quotes.length)])
 })
 
@@ -170,13 +157,13 @@ function parseQuote(raw: string): Quote {
             <span class="bib-sup">MARATHON</span>
             <span class="bib-num">#{{ padded }}</span>
           </div>
-          <div class="progress-label">{{ n }} / 100</div>
+          <div class="progress-label">{{ n }} / {{ RACE_COUNT }}</div>
         </div>
       </div>
 
       <div class="progress-bar-track">
-        <div class="progress-bar-fill" :style="{ width: (n / 100 * 100) + '%' }" />
-        <div class="progress-bar-icon" :style="{ left: (n / 100 * 100) + '%' }">
+        <div class="progress-bar-fill" :style="{ width: (n / RACE_COUNT * 100) + '%' }" />
+        <div class="progress-bar-icon" :style="{ left: (n / RACE_COUNT * 100) + '%' }">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
             <path d="M13.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM9.8 8.9L7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3C14.8 12 16.8 13 19 13v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1L6 8.3V13h2V9.6l1.8-.7"/>
           </svg>

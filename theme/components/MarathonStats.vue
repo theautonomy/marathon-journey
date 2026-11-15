@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { RACES } from '../races'
+import { computed } from 'vue'
 
 interface MarathonData {
   id: number
@@ -47,17 +48,7 @@ function equivSeconds(m: MarathonData): number {
   return Infinity
 }
 
-const marathons = ref<MarathonData[]>([])
-
-onMounted(async () => {
-  const base = import.meta.env.BASE_URL
-  const results = await Promise.all(
-    Array.from({ length: 100 }, (_, i) =>
-      fetch(`${base}marathon/data/marathon${i + 1}.json`).then(r => r.json())
-    )
-  )
-  marathons.value = results
-})
+const marathons = computed<MarathonData[]>(() => RACES)
 
 const completed = computed(() =>
   marathons.value.filter(m => m.time !== 'TBD')
@@ -146,7 +137,7 @@ const ultraCount = computed(() =>
   <div v-if="completed.length && ultraCount" class="ms-footnote">
     * {{ ultraCount }} ultra races (50K / 50 Miles / 100K) converted to marathon-equivalent times
   </div>
-  <div v-else class="ms-loading">Loading stats…</div>
+  <div v-if="!completed.length" class="ms-loading">Loading stats…</div>
 </template>
 
 <style scoped>

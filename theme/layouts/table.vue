@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { RACE_COUNT, RACES_PER_TABLE_PAGE } from '../races'
 const base = import.meta.env.BASE_URL
 defineProps<{ page: number }>()
 </script>
@@ -18,7 +19,7 @@ defineProps<{ page: number }>()
           <span class="eyebrow-line" />Race Log
         </div>
         <div class="tbl-page">
-          {{ (page - 1) * 10 + 1 }}–{{ page * 10 }} of 100
+          {{ (page - 1) * RACES_PER_TABLE_PAGE + 1 }}–{{ Math.min(page * RACES_PER_TABLE_PAGE, RACE_COUNT) }} of {{ RACE_COUNT }}
         </div>
       </div>
 
