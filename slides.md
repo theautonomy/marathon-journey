@@ -1,6 +1,7 @@
 ---
 theme: ./theme
 title: My Marathon Journey
+favicon: /favicon.svg
 author: Wei Li
 layout: cover
 ---
