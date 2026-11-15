@@ -29,6 +29,7 @@ The race list is driven entirely by `data/marathon<N>.json`; nothing else holds 
 
 - **Slides:** `slides.md` has one placeholder slide whose frontmatter is `marathon: races`. The preparser in `theme/setup/preparser.ts` expands it into the race-log table pages (10 races per page) and one `layout: marathon` slide per data file, ordered by `id`.
 - **Theme:** `theme/races.ts` bundles every data file with `import.meta.glob`, and the stats, table, navigator and progress bar all read from it.
+- **Text:** the cover badge reads the same count, and `<RaceCount />` puts it in slide text, e.g. `## From the first step to <RaceCount /> finish lines`.
 
 To add a race, drop in `data/marathon<N>.json` (with `"id": N`) and, if it has its own photo, `public/marathon/img/<picture>`. In `pnpm dev`, restart the server after adding or removing a file so the slide list is regenerated.
 

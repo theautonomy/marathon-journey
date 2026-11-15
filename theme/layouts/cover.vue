@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { RACE_COUNT } from '../races'
+
 const base = import.meta.env.BASE_URL
 
 defineProps<{
@@ -30,7 +32,7 @@ defineProps<{
       <div class="cover-footer">
         <span v-if="author" class="cover-author">{{ author }}</span>
         <div class="cover-badge">
-          <span class="badge-number">100</span>
+          <span class="badge-number">{{ RACE_COUNT }}</span>
           <span class="badge-label">Marathons</span>
         </div>
       </div>

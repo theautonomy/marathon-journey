@@ -8,7 +8,7 @@ layout: cover
 
 # My Marathon Journey
 
-## From the first step to one hundred finish lines
+## From the first step to <RaceCount /> finish lines
 
 ---
 layout: stats
@@ -24,7 +24,7 @@ marathon: races
 layout: cover
 ---
 
-# 100 Finish Lines.
+# <RaceCount /> Finish Lines.
 
 ## One race at a time.
 
